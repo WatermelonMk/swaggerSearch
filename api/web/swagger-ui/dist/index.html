@@ -1,0 +1,119 @@
+<!-- HTML for static distribution bundle build -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Swagger UI</title>
+    <link rel="stylesheet" type="text/css" href="./swagger-ui.css" >
+    <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
+    <style>
+      html
+      {
+        box-sizing: border-box;
+        overflow: -moz-scrollbars-vertical;
+        overflow-y: scroll;
+      }
+
+      *,
+      *:before,
+      *:after
+      {
+        box-sizing: inherit;
+      }
+
+      body
+      {
+        margin:0;
+        background: #fafafa;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="swagger-ui"></div>
+
+    <script src="./swagger-ui-bundle.js"> </script>
+    <script src="./swagger-ui-standalone-preset.js"> </script>
+
+    <script>
+        window.onload = function() {
+            swaggerInit();  //初始化
+            $('.download-url-button').bind('click', function () {   //查询接口
+                $('.opblock-summary-description').each(function () {
+                  $(this).parent('div').parent().parent().addClass('span-api');
+                  $(this).parent('div').parent().parent().removeClass('hide-api');
+                });
+                var searchText = trim($('.download-url-input').val());  //获取搜索的信息
+                showAll();  //显示所有的节点
+                if(searchText != '') {
+                    judgeChildreShow(searchText); //显示对应的子节点
+                    judgeParentShow();  //显示对应的父节点
+                }
+            })
+        }
+  </script>
+  </body>
+</html>
+<script>
+  //初始化Swagger组件
+  function swaggerInit() {
+    const ui = SwaggerUIBundle({
+      url: "/swagger-docs/swagger.json",///swagger-docs/swagger.json"
+      dom_id: '#swagger-ui',
+      deepLinking: true,
+      presets: [
+        SwaggerUIBundle.presets.apis,
+        SwaggerUIStandalonePreset
+      ],
+      plugins: [
+        SwaggerUIBundle.plugins.DownloadUrl
+      ],
+      layout: "StandaloneLayout"
+    })
+    window.ui = ui;
+  }
+
+  //判断子节点显示
+  function judgeChildreShow(searchText) {
+      $('.opblock-summary-description').each(function () {
+          //判断是否包含这个字符串
+          if($(this).text().search(searchText) != -1) {
+              $(this).parent('div').parent().parent().show();
+          } else {
+              $(this).parent('div').parent().parent().hide();
+            $(this).parent('div').parent().parent().addClass('hide-api');
+          }
+      });
+  }
+
+  //判断父节点显示
+  function judgeParentShow() {
+      $('.wrapper').each(function () {
+          var allNum = $(this).find('.span-api').length;
+          if(allNum > 0) {
+              var hiddenNum = $(this).find('.hide-api').length;
+              if (allNum == hiddenNum && allNum != 0) {
+                  $(this).hide();
+              }
+          }
+      });
+  }
+
+  //显示所有的节点
+  function showAll() {
+      $('.wrapper').each(function () {
+          $(this).show();
+      });
+      $('.opblock-summary-description').each(function () {
+          $(this).parent('div').parent().parent().show();
+      })
+  }
+
+  //去左右空格;
+  function trim(s){
+     return s.replace(/(^\s*)|(\s*$)/g, "");
+  }
+</script>
+<script src="../../js/jquery-1.11.1.min.js"></script>
+
